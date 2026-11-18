@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Website Link Analysis API - Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+
+  <!-- Navbar -->
+  <header class="bg-white/90 backdrop-blur sticky top-0 z-50 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+          <i class="fa-solid fa-chart-line text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900 leading-tight">AI Link Analysis API</h1>
+          <p class="text-xs text-slate-500">Business, SEO, Competitor & Audience Intelligence</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <!-- <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-500 animate-pulse"></span> FastAPI 0.110+ Live
+        </span> -->
+        <a href="/docs" target="_blank" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 transition text-slate-700 flex items-center space-x-1.5">
+          <i class="fa-solid fa-book text-slate-400"></i>
+          <span>API Docs</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero & Input Form -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    
+    <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
+      <div class="max-w-3xl">
+        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Analyze Any Website URL</h2>
+        <p class="mt-1 text-sm text-slate-500">
+          Extract full-page content, benchmark multiple LLMs (Gemini, DeepSeek, Groq), and generate production business & SEO intelligence.
+        </p>
+      </div>
+
+      <form id="analysisForm" class="mt-6 space-y-4">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-globe"></i>
+            </span>
+            <input 
+              type="url" 
+              id="urlInput" 
+              required
+              placeholder="https://example.com" 
+              class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm font-medium transition placeholder:text-slate-400"
+            />
+          </div>
+
+          <!-- Groq Engine Badge -->
+          <div class="sm:w-64 flex items-center justify-center px-4 py-3 rounded-xl border border-amber-200 bg-amber-50/80 text-amber-900 text-xs font-semibold space-x-2">
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            <span>⚡ Groq LPU (Llama 3.3 70B)</span>
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            id="submitBtn"
+            class="px-6 py-3 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-semibold text-sm shadow-md shadow-sky-500/20 transition flex items-center justify-center space-x-2 shrink-0 disabled:opacity-50"
+          >
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Analyze Link</span>
+          </button>
+        </div>
+
+        <!-- Options row -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+          <div class="flex items-center space-x-2 text-xs font-semibold text-slate-600">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>⚡ Ultra-fast LPU inference (~280 tokens/sec) via Groq</span>
+          </div>
+
+          <!-- Sample Links -->
+          <div class="flex items-center space-x-2 text-xs text-slate-500">
+            <span>Try sample:</span>
+            <button type="button" onclick="setSample('https://stripe.com')" class="text-sky-600 hover:underline font-medium">Stripe</button>
+            <span>•</span>
+            <button type="button" onclick="setSample('https://vercel.com')" class="text-sky-600 hover:underline font-medium">Vercel</button>
+            <span>•</span>
+            <button type="button" onclick="setSample('https://github.com')" class="text-sky-600 hover:underline font-medium">GitHub</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="hidden py-16 text-center space-y-4">
+      <div class="inline-block relative">
+        <div class="w-14 h-14 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-slate-800">Scraping & Understanding Website Content...</h3>
+        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto" id="loadingStep">
+          Cleaning HTML, extracting headings & metadata, and running AI business analysis model...
+        </p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-5 text-rose-800 text-sm space-y-2">
+      <div class="flex items-center space-x-2 font-bold text-rose-900">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span id="errorTitle">Analysis Request Failed</span>
+      </div>
+      <p id="errorMessage" class="text-xs text-rose-700"></p>
+    </div>
+
+    <!-- Comparison Scorecard (Appears in compare mode) -->
+    <div id="comparisonScorecard" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+          <span>🏆 LLM Platform Performance & Cost Benchmark</span>
+        </h3>
+        <span id="bestModelBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+          Recommended: Gemini 2.0 Flash
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="comparisonGrid">
+        <!-- Dynamic comparison cards injected here -->
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="resultsSection" class="hidden space-y-6">
+
+      <!-- Brand Overview Header -->
+      <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl p-6 sm:p-8 shadow-lg">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span id="brandCategoryBadge" class="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-400/30">
+                Technology
+              </span>
+              <span id="websiteUrlLabel" class="text-xs text-slate-400"></span>
+            </div>
+            <h2 id="brandNameHeading" class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1 text-white">Brand Name</h2>
+          </div>
+          <div class="flex items-center space-x-3 text-xs" id="metricsPills">
+            <!-- Latency & tokens pill -->
+          </div>
+        </div>
+        <p id="brandSummaryText" class="mt-4 text-sm text-slate-300 leading-relaxed max-w-4xl"></p>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="border-b border-slate-200">
+        <nav class="flex space-x-4 sm:space-x-8 overflow-x-auto" aria-label="Tabs">
+          <button onclick="switchTab('competitors')" id="tab-competitors" class="tab-btn pb-4 px-1 border-b-2 font-bold text-sm text-sky-600 border-sky-600 whitespace-nowrap">
+            1. Competitor Analysis
+          </button>
+          <button onclick="switchTab('queries')" id="tab-queries" class="tab-btn pb-4 px-1 border-b-2 font-medium text-sm text-slate-500 border-transparent hover:text-slate-700 whitespace-nowrap">
+            2. Search Queries (5 Platforms)
+          </button>
+          <button onclick="switchTab('seo')" id="tab-seo" class="tab-btn pb-4 px-1 border-b-2 font-medium text-sm text-slate-500 border-transparent hover:text-slate-700 whitespace-nowrap">
+            3. SEO Improvements
+          </button>
+          <button onclick="switchTab('services')" id="tab-services" class="tab-btn pb-4 px-1 border-b-2 font-medium text-sm text-slate-500 border-transparent hover:text-slate-700 whitespace-nowrap">
+            4. Top 5 Services
+          </button>
+          <button onclick="switchTab('audience')" id="tab-audience" class="tab-btn pb-4 px-1 border-b-2 font-medium text-sm text-slate-500 border-transparent hover:text-slate-700 whitespace-nowrap">
+            5. Target Audience
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab 1: Competitor Analysis -->
+      <div id="pane-competitors" class="tab-pane space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <h4 class="text-sm font-bold text-emerald-700 uppercase tracking-wider flex items-center space-x-2">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>Brand Competitive Advantages</span>
+            </h4>
+            <ul id="brandStrengthsList" class="mt-4 space-y-2.5 text-sm text-slate-700"></ul>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <h4 class="text-sm font-bold text-indigo-700 uppercase tracking-wider flex items-center space-x-2">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Market Opportunities to Improve Positioning</span>
+            </h4>
+            <ul id="brandOpportunitiesList" class="mt-4 space-y-2.5 text-sm text-slate-700"></ul>
+          </div>
+        </div>
+
+        <!-- Competitor Comparison Table -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <h4 class="text-base font-bold text-slate-900">Identified Competitors Comparison</h4>
+            <span class="text-xs text-slate-500">Minimum 3 benchmarked</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200">
+                <tr>
+                  <th class="px-5 py-3.5">Competitor</th>
+                  <th class="px-5 py-3.5">Main Service</th>
+                  <th class="px-5 py-3.5">Target Market</th>
+                  <th class="px-5 py-3.5">Key Strength</th>
+                  <th class="px-5 py-3.5">Weakness / Gap</th>
+                  <th class="px-5 py-3.5">Our Opportunity</th>
+                </tr>
+              </thead>
+              <tbody id="competitorsTableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Top 5 Target Search Queries -->
+      <div id="pane-queries" class="tab-pane hidden space-y-4">
+        <p class="text-xs text-slate-500">5 tailored high-intent search queries mapped across Google, Facebook, Instagram, LinkedIn, and X.</p>
+        <div id="queriesList" class="grid grid-cols-1 gap-4"></div>
+      </div>
+
+      <!-- Tab 3: SEO Improvements -->
+      <div id="pane-seo" class="tab-pane hidden space-y-6">
+        <!-- Keywords -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+          <h4 class="text-base font-bold text-slate-900">Keyword Recommendations</h4>
+          <div class="space-y-3">
+            <div>
+              <span class="text-xs font-semibold text-slate-500 uppercase">Primary Keyword:</span>
+              <div class="mt-1">
+                <span id="primaryKeywordBadge" class="inline-flex px-3 py-1 rounded-lg text-sm font-bold bg-sky-100 text-sky-800 border border-sky-300"></span>
+              </div>
+            </div>
+            <div>
+              <span class="text-xs font-semibold text-slate-500 uppercase">Secondary Keywords:</span>
+              <div id="secondaryKeywordsList" class="flex flex-wrap gap-2 mt-1"></div>
+            </div>
+            <div>
+              <span class="text-xs font-semibold text-slate-500 uppercase">Long-Tail Search Queries:</span>
+              <div id="longTailKeywordsList" class="flex flex-wrap gap-2 mt-1"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Title & Meta Snippet preview -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-3">
+            <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Recommended SEO Title</h4>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 text-sm font-semibold" id="seoTitlePreview"></div>
+            <p class="text-xs text-slate-500" id="seoTitleStructure"></p>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-3">
+            <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Recommended Meta Description</h4>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-xs leading-relaxed" id="seoMetaDescription"></div>
+          </div>
+        </div>
+
+        <!-- Supporting Content -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+          <h4 class="text-base font-bold text-slate-900">Recommended Supporting Content & Landing Pages</h4>
+          <div id="supportingContentList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Top 5 Services -->
+      <div id="pane-services" class="tab-pane hidden space-y-4">
+        <p class="text-xs text-slate-500">Core business offerings identified from actual content, labeled where inferred.</p>
+        <div id="servicesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+      </div>
+
+      <!-- Tab 5: Target Audience -->
+      <div id="pane-audience" class="tab-pane hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Primary Target Audience</h4>
+            <div id="primaryAudienceList" class="space-y-3"></div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Secondary Target Audience</h4>
+            <div id="secondaryAudienceList" class="space-y-3"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Industry Segments</h4>
+            <div id="audienceIndustries" class="flex flex-wrap gap-2"></div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Customer Needs & Pains</h4>
+            <ul id="customerNeedsList" class="text-xs text-slate-700 space-y-2"></ul>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Recommended Segments</h4>
+            <div id="recommendedSegmentsList" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Raw JSON viewer toggle -->
+      <div class="pt-4 flex justify-end">
+        <button onclick="toggleRawJson()" class="text-xs font-semibold px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-code"></i>
+          <span>Toggle Raw API JSON</span>
+        </button>
+      </div>
+      <div id="rawJsonBox" class="hidden bg-slate-900 text-slate-200 rounded-2xl p-5 text-xs font-mono overflow-x-auto max-h-96">
+        <pre id="rawJsonContent"></pre>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-200 bg-white py-6">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 space-y-1">
+      <p>Python Practical Test — AI-Powered Website Link Analysis API</p>
+      <p>Powered by Meta Llama 3.3 70B on Groq Language Processing Units (LPU)</p>
+    </div>
+  </footer>
+
+  <!-- Frontend Logic -->
+  <script>
+    let currentRawData = null;
+
+    function setSample(url) {
+      document.getElementById('urlInput').value = url;
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('text-sky-600', 'border-sky-600', 'font-bold');
+        btn.classList.add('text-slate-500', 'border-transparent', 'font-medium');
+      });
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+
+      const activeBtn = document.getElementById(`tab-${name}`);
+      const activePane = document.getElementById(`pane-${name}`);
+      if (activeBtn && activePane) {
+        activeBtn.classList.remove('text-slate-500', 'border-transparent', 'font-medium');
+        activeBtn.classList.add('text-sky-600', 'border-sky-600', 'font-bold');
+        activePane.classList.remove('hidden');
+      }
+    }
+
+    function toggleRawJson() {
+      const box = document.getElementById('rawJsonBox');
+      box.classList.toggle('hidden');
+    }
+
+    document.getElementById('analysisForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = document.getElementById('urlInput').value.trim();
+      const model = 'groq';
+      const compare = document.getElementById('compareCheck') ? document.getElementById('compareCheck').checked : false;
+
+      // UI reset
+      document.getElementById('errorState').classList.add('hidden');
+      document.getElementById('resultsSection').classList.add('hidden');
+      document.getElementById('comparisonScorecard').classList.add('hidden');
+      document.getElementById('loadingState').classList.remove('hidden');
+      document.getElementById('submitBtn').disabled = true;
+
+      try {
+        let endpoint = `/link-analysis?model=groq`;
+        if (compare) endpoint += '&compare=true';
+
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url })
+        });
+
+        const data = await res.json();
+        currentRawData = data;
+        document.getElementById('rawJsonContent').textContent = JSON.stringify(data, null, 2);
+
+        if (!res.ok || data.success === false) {
+          throw new Error(data.error || data.detail || 'Analysis failed');
+        }
+
+        renderResults(data, compare);
+      } catch (err) {
+        document.getElementById('errorState').classList.remove('hidden');
+        document.getElementById('errorMessage').textContent = err.message || 'Network error or server unavailable';
+      } finally {
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('submitBtn').disabled = false;
+      }
+    });
+
+    function renderResults(data, isCompare) {
+      // Comparison scoreboard
+      if (isCompare && data.comparison) {
+        const grid = document.getElementById('comparisonGrid');
+        grid.innerHTML = '';
+        document.getElementById('bestModelBadge').textContent = `🏆 Recommended: ${data.best_recommendation.toUpperCase()}`;
+
+        for (const [providerKey, item] of Object.entries(data.comparison)) {
+          const isWinner = providerKey.toLowerCase() === data.best_recommendation.toLowerCase();
+          const card = document.createElement('div');
+          card.className = `p-5 rounded-2xl border transition ${isWinner ? 'bg-sky-50/70 border-sky-300 ring-2 ring-sky-500/20' : 'bg-white border-slate-200'}`;
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-slate-900 capitalize">${item.provider || providerKey}</span>
+              ${isWinner ? '<span class="text-xs px-2 py-0.5 rounded-full font-bold bg-sky-600 text-white">Winner</span>' : ''}
+            </div>
+            <div class="text-xs text-slate-500 mt-0.5 font-mono">${item.model || ''}</div>
+            <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-white p-2.5 rounded-xl border border-slate-100">
+                <span class="text-slate-400 block">Response Time</span>
+                <span class="font-bold text-slate-800 text-sm">${item.response_time_ms ? item.response_time_ms.toFixed(0) + ' ms' : 'N/A'}</span>
+              </div>
+              <div class="bg-white p-2.5 rounded-xl border border-slate-100">
+                <span class="text-slate-400 block">Est. Cost</span>
+                <span class="font-bold text-emerald-600 text-sm">${item.estimated_cost_usd !== null ? '$' + item.estimated_cost_usd.toFixed(6) : 'Free / N/A'}</span>
+              </div>
+            </div>
+            ${item.error ? `<div class="mt-2 text-xs text-rose-600">${item.error}</div>` : ''}
+          `;
+          grid.appendChild(card);
+        }
+        document.getElementById('comparisonScorecard').classList.remove('hidden');
+      }
+
+      // Brand Info
+      const brand = data.brand || {};
+      const analysis = data.analysis || {};
+      document.getElementById('brandNameHeading').textContent = brand.name || 'Brand Overview';
+      document.getElementById('brandCategoryBadge').textContent = brand.category || 'General';
+      document.getElementById('websiteUrlLabel').textContent = data.website || '';
+      document.getElementById('brandSummaryText').textContent = brand.summary || '';
+
+      // Metrics pill
+      const metricsContainer = document.getElementById('metricsPills');
+      metricsContainer.innerHTML = '';
+      if (data.llm_metrics) {
+        metricsContainer.innerHTML = `
+          <span class="bg-white/10 px-3 py-1 rounded-lg backdrop-blur text-slate-200">
+            ⚡ ${data.llm_metrics.response_time_ms.toFixed(0)} ms
+          </span>
+          <span class="bg-white/10 px-3 py-1 rounded-lg backdrop-blur text-emerald-300">
+            ${data.llm_metrics.estimated_cost_usd ? '$' + data.llm_metrics.estimated_cost_usd.toFixed(6) : 'Free Tier'}
+          </span>
+          <span class="bg-white/10 px-3 py-1 rounded-lg backdrop-blur text-slate-200">
+            ${data.llm_metrics.provider}
+          </span>
+        `;
+      }
+
+      // 1. Competitors
+      const ca = analysis.competitor_analysis || {};
+      const strengthsList = document.getElementById('brandStrengthsList');
+      strengthsList.innerHTML = (ca.brand_strengths || []).map(s => `<li class="flex items-start space-x-2"><i class="fa-solid fa-check text-emerald-600 mt-1 shrink-0"></i><span>${s}</span></li>`).join('');
+
+      const oppsList = document.getElementById('brandOpportunitiesList');
+      oppsList.innerHTML = (ca.opportunities || []).map(o => `<li class="flex items-start space-x-2"><i class="fa-solid fa-arrow-trend-up text-indigo-600 mt-1 shrink-0"></i><span>${o}</span></li>`).join('');
+
+      const compTbody = document.getElementById('competitorsTableBody');
+      compTbody.innerHTML = (ca.competitors || []).map(c => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-5 py-3.5 font-bold text-slate-900">${c.name}</td>
+          <td class="px-5 py-3.5">${c.main_service || '-'}</td>
+          <td class="px-5 py-3.5">${c.target_market || '-'}</td>
+          <td class="px-5 py-3.5 text-emerald-700 font-medium">${c.key_strength || '-'}</td>
+          <td class="px-5 py-3.5 text-rose-700">${c.weakness || '-'}</td>
+          <td class="px-5 py-3.5 text-sky-800 font-medium">${c.opportunity || '-'}</td>
+        </tr>
+      `).join('');
+
+      // 2. Search queries
+      const queriesList = document.getElementById('queriesList');
+      queriesList.innerHTML = (analysis.target_search_queries || []).map(q => `
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1 flex-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm font-bold text-slate-900">${q.query}</span>
+              <span class="px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">${q.intent}</span>
+            </div>
+            <p class="text-xs text-slate-500">${q.business_relevance || ''}</p>
+            <p class="text-xs text-slate-400">Target Audience: ${q.target_audience || 'General'}</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 shrink-0">
+            ${(q.platforms || []).map(p => `<span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">${p}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      // 3. SEO
+      const seo = analysis.seo_improvements || {};
+      const kw = seo.keywords || {};
+      document.getElementById('primaryKeywordBadge').textContent = kw.primary_keyword || seo.primary_keyword || 'N/A';
+      document.getElementById('secondaryKeywordsList').innerHTML = (kw.secondary_keywords || seo.secondary_keywords || []).map(k => `<span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">${k}</span>`).join('');
+      document.getElementById('longTailKeywordsList').innerHTML = (kw.long_tail_keywords || []).map(k => `<span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-sky-50 text-sky-700 border border-sky-200">${k}</span>`).join('');
+
+      document.getElementById('seoTitlePreview').textContent = seo.recommended_title || 'N/A';
+      document.getElementById('seoTitleStructure').textContent = seo.improved_title_structure || '';
+      document.getElementById('seoMetaDescription').textContent = seo.meta_description || 'N/A';
+
+      document.getElementById('supportingContentList').innerHTML = (seo.supporting_content || []).map(sc => `
+        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-sky-700">${sc.type}</span>
+            <span class="text-xs text-emerald-700 font-semibold"><i class="fa-solid fa-arrow-up-right-dots mr-1"></i>${sc.seo_benefit || 'SEO Boost'}</span>
+          </div>
+          <h5 class="text-sm font-bold text-slate-900">${sc.title}</h5>
+          <p class="text-xs text-slate-600">${sc.description}</p>
+        </div>
+      `).join('');
+
+      // 4. Services
+      document.getElementById('servicesGrid').innerHTML = (analysis.top_services || []).map(s => `
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between space-y-3">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">${s.target_industry || 'Services'}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.is_inferred ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}">
+                ${s.is_inferred ? 'Inferred' : 'From Site'}
+              </span>
+            </div>
+            <h4 class="text-base font-bold text-slate-900 mt-1">${s.name}</h4>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">${s.description}</p>
+          </div>
+          <div class="pt-3 border-t border-slate-100 text-xs space-y-1">
+            <div class="text-slate-500"><strong class="text-slate-700">Target:</strong> ${s.target_customer || 'All Customers'}</div>
+            <div class="text-slate-500"><strong class="text-slate-700">Benefit:</strong> ${s.main_benefit || '-'}</div>
+          </div>
+        </div>
+      `).join('');
+
+      // 5. Audience
+      const ta = analysis.target_audience || {};
+      document.getElementById('primaryAudienceList').innerHTML = (ta.primary_audience || []).map(a => `
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+          <div class="font-bold text-slate-900 text-sm">${a.audience}</div>
+          <div class="text-slate-600">Type: <span class="font-medium text-slate-800">${a.business_type}</span></div>
+          <div class="text-sky-700 font-medium">Requirement: ${a.requirement}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('secondaryAudienceList').innerHTML = (ta.secondary_audience || []).map(a => `
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+          <div class="font-bold text-slate-900 text-sm">${a.audience}</div>
+          <div class="text-slate-600">Type: <span class="font-medium text-slate-800">${a.business_type}</span></div>
+          <div class="text-slate-700 font-medium">Requirement: ${a.requirement}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('audienceIndustries').innerHTML = (ta.industries || []).map(i => `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">${i}</span>`).join('');
+      document.getElementById('customerNeedsList').innerHTML = (ta.customer_needs || []).map(n => `<li class="flex items-start space-x-1.5"><i class="fa-solid fa-circle-dot text-sky-500 text-[10px] mt-1 shrink-0"></i><span>${n}</span></li>`).join('');
+      document.getElementById('recommendedSegmentsList').innerHTML = (ta.recommended_segments || []).map(s => `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">${s}</span>`).join('');
+
+      // Display results
+      document.getElementById('resultsSection').classList.remove('hidden');
+      switchTab('competitors');
+    }
+  </script>
+</body>
+</html>
